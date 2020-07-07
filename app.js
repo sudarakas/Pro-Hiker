@@ -1,22 +1,30 @@
+const fs = require('fs');
 const express = require('express');
-//init express app
+
 const app = express();
-//set the port
 const port = 3000;
 
-//routes
-app.get('/', (req, res) => {
+const hikes = JSON.parse(
+    fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`
+    ));
+
+app.get('/api/v1/hikes', (req, res) => {
     res
         .status(200)
         .json({
-            message: 'Server is working fine',
-            app: 'Travel Me'
+            status: 'success',
+            result: hikes.length,
+            data: {
+                hikes: hikes
+            }
         })
 })
 
-app.post('/', (req, res) => {
-    res.send('Post req route')
-})
+
+
+
+
+
 
 //run the server
 app.listen(port, () => {
