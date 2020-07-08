@@ -44,9 +44,37 @@ app.post('/api/v1/hikes', (req, res) => {
 
 })
 
+//specify id
+app.get('/api/v1/hikes/:id', (req, res) => {
+    /*
+        note: we can use ? to set optional params
+        eg: /api/v1/hikes/:id/:user?
+        in here, the user id is optional
+    */
+
+    // const id = req.params.id  * 1;
+    // const hike = hikes.find(element => element.id === id)
+    // console.log(hike)
 
 
+    if (req.params.id > hikes.length) {
+        return res
+        .status(404)
+        .json({
+            status: 'fail',
+            message: '404 - Plan Not Found'
+        })
+    }
 
+    res
+        .status(200)
+        .json({
+            status: 'success',
+            data: {
+                hikes: hikes[req.params.id]
+            }
+        })
+})
 
 
 //run the server
