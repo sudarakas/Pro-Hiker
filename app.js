@@ -4,6 +4,9 @@ const express = require('express');
 const app = express();
 const port = 3000;
 
+//middlewares
+app.use(express.json()); //convert json to js obj
+
 const hikes = JSON.parse(
     fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`
     ));
@@ -20,6 +23,26 @@ app.get('/api/v1/hikes', (req, res) => {
         })
 })
 
+
+app.post('/api/v1/hikes', (req, res) => {
+
+    const newId = hikes[hikes.length - 1].id + 1;
+    const newHike = Object.assign({ id: newId }, req.body)
+
+    hikes.push(newHike);
+    fs.writeFile(`${__dirname}/dev-data/data/tours-simple.json`, JSON.stringify(hikes), (err) => {
+        res
+            .status(201)
+            .json({
+                status: 'success',
+                data: {
+                    hike: newHike
+                }
+            })
+    })
+
+
+})
 
 
 
