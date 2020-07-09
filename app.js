@@ -59,11 +59,11 @@ app.get('/api/v1/hikes/:id', (req, res) => {
 
     if (req.params.id > hikes.length) {
         return res
-        .status(404)
-        .json({
-            status: 'fail',
-            message: '404 - Plan Not Found'
-        })
+            .status(404)
+            .json({
+                status: 'fail',
+                message: '404 - Plan Not Found'
+            })
     }
 
     res
@@ -72,6 +72,28 @@ app.get('/api/v1/hikes/:id', (req, res) => {
             status: 'success',
             data: {
                 hikes: hikes[req.params.id]
+            }
+        })
+})
+
+//Patch
+app.patch('/api/v1/hikes/:id', (req, res) => {
+
+    if (req.params.id > hikes.length) {
+        return res
+            .status(404)
+            .json({
+                status: 'fail',
+                message: '404 - Plan Not Found'
+            })
+    }
+
+    res
+        .status(200)
+        .json({
+            status: 'success',
+            data: {
+                hike: 'Updated'
             }
         })
 })
