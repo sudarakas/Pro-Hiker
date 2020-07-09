@@ -2,7 +2,7 @@ const fs = require('fs');
 const express = require('express');
 
 const app = express();
-const port = 3000;
+
 
 //middlewares
 app.use(express.json()); //convert json to js obj
@@ -11,7 +11,9 @@ const hikes = JSON.parse(
     fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`
     ));
 
-app.get('/api/v1/hikes', (req, res) => {
+
+//get all hikes
+const getAllHikes = (req, res) => {
     res
         .status(200)
         .json({
@@ -21,10 +23,10 @@ app.get('/api/v1/hikes', (req, res) => {
                 hikes: hikes
             }
         })
-})
+}
 
-
-app.post('/api/v1/hikes', (req, res) => {
+//add new hike
+const addNewHike = (req, res) => {
 
     const newId = hikes[hikes.length - 1].id + 1;
     const newHike = Object.assign({ id: newId }, req.body)
@@ -40,12 +42,10 @@ app.post('/api/v1/hikes', (req, res) => {
                 }
             })
     })
+}
 
-
-})
-
-//specify id
-app.get('/api/v1/hikes/:id', (req, res) => {
+//get a hike
+const getHikeById = (req, res) => {
     /*
         note: we can use ? to set optional params
         eg: /api/v1/hikes/:id/:user?
@@ -74,10 +74,10 @@ app.get('/api/v1/hikes/:id', (req, res) => {
                 hikes: hikes[req.params.id]
             }
         })
-})
+}
 
-//Patch
-app.patch('/api/v1/hikes/:id', (req, res) => {
+//update hike
+const updateHike = (req, res) => {
 
     if (req.params.id > hikes.length) {
         return res
@@ -96,11 +96,10 @@ app.patch('/api/v1/hikes/:id', (req, res) => {
                 hike: 'Updated'
             }
         })
-})
+}
 
-//delete
-app.delete('/api/v1/hikes/:id', (req, res) => {
-    
+const deleteHike = (req, res) => {
+
     if (req.params.id > hikes.length) {
         return res
             .status(404)
@@ -109,7 +108,7 @@ app.delete('/api/v1/hikes/:id', (req, res) => {
                 message: '404 - Plan Not Found'
             })
     }
-    
+
     res
         .status(204)
         .json({
@@ -118,10 +117,30 @@ app.delete('/api/v1/hikes/:id', (req, res) => {
                 hike: 'null'
             }
         })
-})
+}
+
+//routes
+// app.get('/api/v1/hikes', getAllHikes);
+// app.post('/api/v1/hikes', addNewHike);
+// app.get('/api/v1/hikes/:id', getHikeById);
+// app.patch('/api/v1/hikes/:id', updateHike);
+// app.delete('/api/v1/hikes/:id', deleteHike);
+
+app
+    .route('api/v1/hikes')
+    .get(getAllHikes)
+    .post(addNewHike)
+
+app
+    .route('/api/v1/hikes/:id')
+    .get(getHikeById)
+    .patch(updateHike)
+    .delete(deleteHike)
+
 
 
 //run the server
+const port = 3000;
 app.listen(port, () => {
     console.log(`App running on port ${port}`)
 })
