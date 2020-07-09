@@ -98,6 +98,28 @@ app.patch('/api/v1/hikes/:id', (req, res) => {
         })
 })
 
+//delete
+app.delete('/api/v1/hikes/:id', (req, res) => {
+    
+    if (req.params.id > hikes.length) {
+        return res
+            .status(404)
+            .json({
+                status: 'fail',
+                message: '404 - Plan Not Found'
+            })
+    }
+    
+    res
+        .status(204)
+        .json({
+            status: 'success',
+            data: {
+                hike: 'null'
+            }
+        })
+})
+
 
 //run the server
 app.listen(port, () => {
