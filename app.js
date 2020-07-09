@@ -1,11 +1,18 @@
 const fs = require('fs');
 const express = require('express');
+const morgan = require('morgan');
 
 const app = express();
 
 
 //middlewares
+app.use(morgan('dev'));
 app.use(express.json()); //convert json to js obj
+app.use((req, res, next) => {
+    console.log('went through the middleware')
+    next();
+})
+
 
 const hikes = JSON.parse(
     fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`
@@ -127,7 +134,7 @@ const deleteHike = (req, res) => {
 // app.delete('/api/v1/hikes/:id', deleteHike);
 
 app
-    .route('api/v1/hikes')
+    .route('/api/v1/hikes')
     .get(getAllHikes)
     .post(addNewHike)
 
