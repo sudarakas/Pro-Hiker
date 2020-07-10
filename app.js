@@ -8,6 +8,8 @@ const app = express();
 //middlewares
 app.use(morgan('dev'));
 app.use(express.json()); //convert json to js obj
+
+
 app.use((req, res, next) => {
     console.log('went through the middleware')
     next();
@@ -33,7 +35,7 @@ const getAllHikes = (req, res) => {
 }
 
 //add new hike
-const addNewHike = (req, res) => {
+const createHike = (req, res) => {
 
     const newId = hikes[hikes.length - 1].id + 1;
     const newHike = Object.assign({ id: newId }, req.body)
@@ -52,7 +54,7 @@ const addNewHike = (req, res) => {
 }
 
 //get a hike
-const getHikeById = (req, res) => {
+const getHike = (req, res) => {
     /*
         note: we can use ? to set optional params
         eg: /api/v1/hikes/:id/:user?
@@ -136,15 +138,24 @@ const deleteHike = (req, res) => {
 app
     .route('/api/v1/hikes')
     .get(getAllHikes)
-    .post(addNewHike)
+    .post(createHike)
 
 app
     .route('/api/v1/hikes/:id')
-    .get(getHikeById)
+    .get(getHike)
     .patch(updateHike)
     .delete(deleteHike)
 
+app
+    .route('/api/v1/users')
+    .get(getAllUsers)
+    .post(createUser)
 
+app
+    .route('/api/v1/users/:id')
+    .get(getUser)
+    .patch(updateUser)
+    .delete(deleteUser)
 
 //run the server
 const port = 3000;
