@@ -128,6 +128,47 @@ const deleteHike = (req, res) => {
         })
 }
 
+const getAllUsers = (req, res) => {
+    res
+        .status(500)
+        .json({
+            status: 'Server Issue',
+        })
+}
+
+const getUser = (req, res) => {
+    res
+        .status(500)
+        .json({
+            status: 'Server Issue',
+        })
+}
+
+const createUser = (req, res) => {
+    res
+        .status(500)
+        .json({
+            status: 'Server Issue',
+        })
+}
+
+const updateUser = (req, res) => {
+    res
+        .status(500)
+        .json({
+            status: 'Server Issue',
+        })
+}
+
+const deleteUser = (req, res) => {
+    res
+        .status(500)
+        .json({
+            status: 'Server Issue',
+        })
+}
+
+
 //routes
 // app.get('/api/v1/hikes', getAllHikes);
 // app.post('/api/v1/hikes', addNewHike);
@@ -135,27 +176,35 @@ const deleteHike = (req, res) => {
 // app.patch('/api/v1/hikes/:id', updateHike);
 // app.delete('/api/v1/hikes/:id', deleteHike);
 
-app
-    .route('/api/v1/hikes')
+
+const hikeRouter = express.Router();
+const userRouter = express.Router();
+
+hikeRouter
+    .route('/')
     .get(getAllHikes)
     .post(createHike)
 
-app
-    .route('/api/v1/hikes/:id')
+hikeRouter
+    .route('/:id')
     .get(getHike)
     .patch(updateHike)
     .delete(deleteHike)
 
-app
-    .route('/api/v1/users')
+userRouter
+    .route('/')
     .get(getAllUsers)
     .post(createUser)
 
-app
-    .route('/api/v1/users/:id')
+userRouter
+    .route('/:id')
     .get(getUser)
     .patch(updateUser)
     .delete(deleteUser)
+
+
+app.use('/api/v1/users', userRouter);
+app.use('/api/v1/hikes', hikeRouter);
 
 //run the server
 const port = 3000;
