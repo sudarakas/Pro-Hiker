@@ -3,6 +3,17 @@ const fs = require('fs');
 const hikes = JSON.parse(
     fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`));
 
+exports.checkHikeId = (req, res, next, val) => {
+    if (req.params.id  > hikes.length) {
+        return res
+            .status(404)
+            .json({
+                status: 'fail',
+                message: '404 - Plan Not Found'
+            })
+    }
+    next();
+}
 
 //get all hikes
 exports.getAllHikes = (req, res) => {
@@ -48,16 +59,6 @@ exports.getHike = (req, res) => {
     // const hike = hikes.find(element => element.id === id)
     // console.log(hike)
 
-
-    if (req.params.id > hikes.length) {
-        return res
-            .status(404)
-            .json({
-                status: 'fail',
-                message: '404 - Plan Not Found'
-            })
-    }
-
     res
         .status(200)
         .json({
@@ -70,16 +71,6 @@ exports.getHike = (req, res) => {
 
 //update hike
 exports.updateHike = (req, res) => {
-
-    if (req.params.id > hikes.length) {
-        return res
-            .status(404)
-            .json({
-                status: 'fail',
-                message: '404 - Plan Not Found'
-            })
-    }
-
     res
         .status(200)
         .json({
@@ -91,15 +82,6 @@ exports.updateHike = (req, res) => {
 }
 
 exports.deleteHike = (req, res) => {
-
-    if (req.params.id > hikes.length) {
-        return res
-            .status(404)
-            .json({
-                status: 'fail',
-                message: '404 - Plan Not Found'
-            })
-    }
 
     res
         .status(204)

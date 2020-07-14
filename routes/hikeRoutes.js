@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { getAllHikes, getHike, createHike, updateHike, deleteHike } = require('../controllers/hikeController')
+const { getAllHikes, getHike, createHike, updateHike, deleteHike, checkHikeId } = require('../controllers/hikeController')
+
+//can use this type middleware to validate id
+router.param('id', checkHikeId)
 
 router
     .route('/')
