@@ -16,15 +16,13 @@ exports.checkHikeId = (req, res, next, val) => {
 }
 
 exports.validBody = (req, res, next) => {
-    if (req.method != 'GET' || req.method != 'DELETE') {
-        if (req._body != true) {
-            return res
-                .status(400)
-                .json({
-                    status: 'fail',
-                    message: 'Bad Request'
-                })
-        }
+    if (req._body != true) {
+        return res
+            .status(400)
+            .json({
+                status: 'fail',
+                message: 'Bad Request'
+            })
     }
     next();
 }

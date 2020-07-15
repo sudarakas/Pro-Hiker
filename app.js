@@ -4,7 +4,10 @@ const app = express();
 
 
 //middlewares
-app.use(morgan('dev'));
+if (process.env.NODE_ENV === 'development') {
+    app.use(morgan('dev'));
+}
+
 app.use(express.json()); //convert json to js obj
 app.use(express.static(`${__dirname}/public`)) //access static contentes from public
 app.use((req, res, next) => {

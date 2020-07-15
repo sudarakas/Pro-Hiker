@@ -4,14 +4,11 @@ const { getAllHikes, getHike, createHike, updateHike, deleteHike, checkHikeId, v
 
 //can use this type middleware to validate id
 router.param('id', checkHikeId);
-router.use(validBody);
-
-//post(middleware, function)
 
 router
     .route('/')
     .get(getAllHikes)
-    .post(createHike)
+    .post(validBody, createHike)
 
 router
     .route('/:id')
