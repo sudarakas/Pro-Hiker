@@ -4,13 +4,27 @@ const hikes = JSON.parse(
     fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`));
 
 exports.checkHikeId = (req, res, next, val) => {
-    if (req.params.id  > hikes.length) {
+    if (req.params.id > hikes.length) {
         return res
             .status(404)
             .json({
                 status: 'fail',
                 message: '404 - Plan Not Found'
             })
+    }
+    next();
+}
+
+exports.validBody = (req, res, next) => {
+    if (req.method != 'GET' || req.method != 'DELETE') {
+        if (req._body != true) {
+            return res
+                .status(400)
+                .json({
+                    status: 'fail',
+                    message: 'Bad Request'
+                })
+        }
     }
     next();
 }
