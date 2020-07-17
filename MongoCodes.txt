@@ -1,0 +1,6 @@
+use proHiker //for create or switch db
+db.hikes.insertOne({name: "Narangala", price: 1200, rating: 4.6}) //insert a single record
+db.hikes.find() //find records
+show dbs // all db
+show collections //all collection
+db.hikes.insertMany([{name: "Hanthana", price: 1500, rating: 4.9}, {name: "Bambaragala", price: 2500, rating: 4.3}])
