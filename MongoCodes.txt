@@ -4,3 +4,8 @@ db.hikes.find() //find records
 show dbs // all db
 show collections //all collection
 db.hikes.insertMany([{name: "Hanthana", price: 1500, rating: 4.9}, {name: "Bambaragala", price: 2500, rating: 4.3}])
+db.hikes.find({name: "Hanthana"})
+db.hikes.find({price: {$lte: 1500}}) //less than and equal
+db.hikes.find({price: {$lte: 1500}, rating: {$gt: 4.8}}) //and
+db.hikes.find({$or: [{price: {$lte: 1500}, rating: {$gt: 4.8}}]}) //or
+db.hikes.find({$or: [{price: {$lte: 1500}, rating: {$gt: 4.8}}]}, {name: "Hanthana"}) //or with and
