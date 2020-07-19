@@ -1,14 +1,23 @@
 const Hike = require('../models/hikeModel');
 
 //get all hikes
-exports.getAllHikes = (req, res) => {
-  res.status(200).json({
-    status: 'success',
-    // result: hikes.length,
-    // data: {
-    //   hikes: hikes,
-    // },
-  });
+exports.getAllHikes = async (req, res) => {
+  try {
+    const hikes = await Hike.find();
+
+    res.status(200).json({
+      status: 'success',
+      result: hikes.length,
+      data: {
+        hikes: hikes,
+      },
+    });
+  } catch (error) {
+    res.status(404).json({
+      status: 'fail',
+      message: error,
+    });
+  }
 };
 
 //add new hike
@@ -31,40 +40,58 @@ exports.createHike = async (req, res) => {
 };
 
 //get a hike
-exports.getHike = (req, res) => {
-  /*
-            note: we can use ? to set optional params
-            eg: /api/v1/hikes/:id/:user?
-            in here, the user id is optional
-        */
-
-  // const id = req.params.id  * 1;
-  // const hike = hikes.find(element => element.id === id)
-  // console.log(hike)
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      //   hikes: hikes[req.params.id],
-    },
-  });
+exports.getHike = async (req, res) => {
+  try {
+    const hike = await Hike.findById(req.params.id);
+    // const hike = Hike.findOne({_id: req.params.id});
+    res.status(200).json({
+      status: 'success',
+      data: {
+        tour: hike,
+      },
+    });
+  } catch (error) {
+    res.status(404).json({
+      status: 'fail',
+      message: error,
+    });
+  }
 };
 
 //update hike
-exports.updateHike = (req, res) => {
-  res.status(200).json({
-    status: 'success',
-    data: {
-      hike: 'Updated',
-    },
-  });
+exports.updateHike = async (req, res) => {
+  try {
+    const hike = await Hike.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    res.status(200).json({
+      status: 'success',
+      data: {
+        hike: hike,
+      },
+    });
+  } catch (error) {
+    res.status(404).json({
+      status: 'fail',
+      message: error,
+    });
+  }
 };
-
-exports.deleteHike = (req, res) => {
-  res.status(204).json({
-    status: 'success',
-    data: {
-      hike: 'null',
-    },
-  });
+//delete hike
+exports.deleteHike = async (req, res) => {
+  try {
+    await Hike.findByIdAndDelete(req.params.id);
+    res.status(204).json({
+      status: 'success',
+      data: {
+        hike: null,
+      },
+    });
+  } catch (error) {
+    res.status(404).json({
+      status: 'fail',
+      message: error,
+    });
+  }
 };
