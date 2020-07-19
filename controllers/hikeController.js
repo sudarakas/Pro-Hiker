@@ -1,14 +1,4 @@
-const Hike = require('./../models/hikeModel');
-
-exports.validBody = (req, res, next) => {
-  if (req._body !== true) {
-    return res.status(400).json({
-      status: 'fail',
-      message: 'Bad Request',
-    });
-  }
-  next();
-};
+const Hike = require('../models/hikeModel');
 
 //get all hikes
 exports.getAllHikes = (req, res) => {
@@ -22,31 +12,31 @@ exports.getAllHikes = (req, res) => {
 };
 
 //add new hike
-exports.createHike = (req, res) => {
-  //   const newId = hikes[hikes.length - 1].id + 1;
-  //   const newHike = Object.assign({ id: newId }, req.body);
-  //   hikes.push(newHike);
-  //   fs.writeFile(
-  //     `${__dirname}/dev-data/data/tours-simple.json`,
-  //     JSON.stringify(hikes),
-  //     (err) => {
-  //       res.status(201).json({
-  //         status: 'success',
-  //         data: {
-  //           hike: newHike,
-  //         },
-  //       });
-  //     }
-  //   );
+exports.createHike = async (req, res) => {
+  try {
+    const newHike = await Hike.create(req.body);
+
+    res.status(201).json({
+      status: 'success',
+      data: {
+        tour: newHike,
+      },
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: 'fail',
+      message: error,
+    });
+  }
 };
 
 //get a hike
 exports.getHike = (req, res) => {
   /*
-        note: we can use ? to set optional params
-        eg: /api/v1/hikes/:id/:user?
-        in here, the user id is optional
-    */
+            note: we can use ? to set optional params
+            eg: /api/v1/hikes/:id/:user?
+            in here, the user id is optional
+        */
 
   // const id = req.params.id  * 1;
   // const hike = hikes.find(element => element.id === id)

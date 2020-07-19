@@ -7,13 +7,12 @@ const {
   createHike,
   updateHike,
   deleteHike,
-  validBody,
 } = require('../controllers/hikeController');
 
 //can use this type middleware to validate id
 // router.param('id', checkHikeId);
 
-router.route('/').get(getAllHikes).post(validBody, createHike);
+router.route('/').get(getAllHikes).post(createHike);
 
 router.route('/:id').get(getHike).patch(updateHike).delete(deleteHike);
 
