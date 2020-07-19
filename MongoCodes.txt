@@ -5,7 +5,14 @@ show dbs // all db
 show collections //all collection
 db.hikes.insertMany([{name: "Hanthana", price: 1500, rating: 4.9}, {name: "Bambaragala", price: 2500, rating: 4.3}])
 db.hikes.find({name: "Hanthana"})
+
 db.hikes.find({price: {$lte: 1500}}) //less than and equal
 db.hikes.find({price: {$lte: 1500}, rating: {$gt: 4.8}}) //and
 db.hikes.find({$or: [{price: {$lte: 1500}, rating: {$gt: 4.8}}]}) //or
 db.hikes.find({$or: [{price: {$lte: 1500}, rating: {$gt: 4.8}}]}, {name: "Hanthana"}) //or with and
+
+db.hikes.updateOne({name: "Narangala"}, {$set: {price: 3000}}) //update a single record
+db.hikes.updateMany({price: {$gte: 2000}}, {$set: {premium: true}}) //update a multiple record
+
+db.hikes.deleteMany({price: {$gte: 3000}}) //delete a multiple record
+db.hikes.deleteMany({}) //delete all
