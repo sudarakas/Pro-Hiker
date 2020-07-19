@@ -22,44 +22,7 @@ mongoose
   .then(() => {
     console.log('DB Connected');
   });
-
-//hikes scheme
-const hikesScheme = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, 'A hike must have a name'],
-    unique: true,
-  },
-  rating: {
-    type: Number,
-    default: 0.0,
-  },
-  price: {
-    type: Number,
-    required: [true, 'A hike must have a price'],
-  },
-});
-
-//create the model with scheme
-const Hike = mongoose.model('Hike', hikesScheme);
-
-//create a new hike
-const testHike = new Hike({
-  name: 'Namunukula Hike',
-  rating: 4.9,
-  price: 4500,
-});
-
-//save the hike
-testHike
-  .save()
-  .then((doc) => {
-    console.log(doc);
-  })
-  .catch((err) => {
-    console.log(err);
-  });
-
+ 
 const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
