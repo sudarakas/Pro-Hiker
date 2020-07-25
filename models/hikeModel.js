@@ -28,9 +28,9 @@ const hikesScheme = new mongoose.Schema({
     type: Number,
     required: [true, 'A hike must have a maximum group size'],
   },
-  diffuclty: {
+  difficulty: {
     type: String,
-    required: [true, 'A hike must have a diffuclty'],
+    required: [true, 'A hike must have a difficulty'],
   },
   price: {
     type: Number,
