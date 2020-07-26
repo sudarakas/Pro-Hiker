@@ -3,11 +3,15 @@ const Hike = require('../models/hikeModel');
 //get all hikes
 exports.getAllHikes = async (req, res) => {
   try {
-    const queryObject = { ...req.query };
     //filter the req query for non search keywords
+    const queryObject = { ...req.query };
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
     excludedFields.forEach((element) => delete queryObject[element]);
-    const searchQuery = await Hike.find(queryObject);
+
+    //advanced filtering for the query
+    let queryStr = JSON.stringify(queryObject);
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`); //add $ sign to query
+    const searchQuery = Hike.find(JSON.parse(queryStr));
 
     //execute the query
     const hikes = await searchQuery;
