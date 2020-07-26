@@ -11,19 +11,39 @@ exports.getAllHikes = async (req, res) => {
     //advanced filtering for the query
     let queryStr = JSON.stringify(queryObject);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`); //add $ sign to query
-    let searchQuery = Hike.find(JSON.parse(queryStr));
+    let query = Hike.find(JSON.parse(queryStr));
 
     //sort the request
     if (req.query.sort) {
       const sortBy = req.query.sort.split(',').join(' ');
-      searchQuery = searchQuery.sort(sortBy);
+      query = query.sort(sortBy);
     } else {
       //default case for the sort
-      searchQuery = searchQuery.sort('-createdAt');
+      query = query.sort('-createdAt');
+    }
+
+    //limit the fields
+    if (req.query.fields) {
+      const fields = req.query.fields.split(',').join(' ');
+      query = query.select(fields);
+    } else {
+      query = query.select('-__v');
+    }
+
+    //pagination
+    const page = req.query.page * 1 || 1;
+    const limit = req.query.limit * 1 || 50;
+    const skip = limit * (page - 1);
+    query = query.skip(skip).limit(limit); //update the query
+
+    //if the page is empty
+    if (req.query.page) {
+      const numHikes = await Hike.countDocuments();
+      if (skip >= numHikes) throw new Error('This page is does not exists');
     }
 
     //execute the query
-    const hikes = await searchQuery;
+    const hikes = await query;
 
     //send the response
     res.status(200).json({
