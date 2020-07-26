@@ -11,7 +11,16 @@ exports.getAllHikes = async (req, res) => {
     //advanced filtering for the query
     let queryStr = JSON.stringify(queryObject);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`); //add $ sign to query
-    const searchQuery = Hike.find(JSON.parse(queryStr));
+    let searchQuery = Hike.find(JSON.parse(queryStr));
+
+    //sort the request
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' ');
+      searchQuery = searchQuery.sort(sortBy);
+    } else {
+      //default case for the sort
+      searchQuery = searchQuery.sort('-createdAt');
+    }
 
     //execute the query
     const hikes = await searchQuery;
