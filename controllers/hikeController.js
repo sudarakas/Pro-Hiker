@@ -30,6 +30,18 @@ exports.getAllHikes = async (req, res) => {
       query = query.select('-__v');
     }
 
+    //pagination
+    const page = req.query.page * 1 || 1;
+    const limit = req.query.limit * 1 || 50;
+    const skip = limit * (page - 1);
+    query = query.skip(skip).limit(limit); //update the query
+
+    //if the page is empty
+    if (req.query.page) {
+      const numHikes = await Hike.countDocuments();
+      if (skip >= numHikes) throw new Error('This page is does not exists');
+    }
+
     //execute the query
     const hikes = await query;
 
