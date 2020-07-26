@@ -3,8 +3,16 @@ const Hike = require('../models/hikeModel');
 //get all hikes
 exports.getAllHikes = async (req, res) => {
   try {
-    const hikes = await Hike.find();
+    const queryObject = { ...req.query };
+    //filter the req query for non search keywords
+    const excludedFields = ['page', 'sort', 'limit', 'fields'];
+    excludedFields.forEach((element) => delete queryObject[element]);
+    const searchQuery = await Hike.find(queryObject);
 
+    //execute the query
+    const hikes = await searchQuery;
+
+    //send the response
     res.status(200).json({
       status: 'success',
       result: hikes.length,
