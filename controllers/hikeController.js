@@ -1,5 +1,13 @@
 const Hike = require('../models/hikeModel');
 
+//middleware for modify the route
+exports.aliastopHikes = (req, res, next) => {
+  req.query.limit = '5';
+  req.query.sort = '-ratingAverage,price';
+  req.query.fields = 'name,price,ratingAverage,summary,difficulty';
+  next();
+};
+
 //get all hikes
 exports.getAllHikes = async (req, res) => {
   try {

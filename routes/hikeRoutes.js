@@ -7,10 +7,13 @@ const {
   createHike,
   updateHike,
   deleteHike,
+  aliastopHikes,
 } = require('../controllers/hikeController');
 
 //can use this type middleware to validate id
 // router.param('id', checkHikeId);
+
+router.route('/top-5-cheap').get(aliastopHikes, getAllHikes);
 
 router.route('/').get(getAllHikes).post(createHike);
 
