@@ -1,25 +1,28 @@
 const express = require('express');
 
 const router = express.Router();
-const {
-  getAllHikes,
-  getHike,
-  createHike,
-  updateHike,
-  deleteHike,
-  aliastopHikes,
-  getHikeStats,
-} = require('../controllers/hikeController');
+const hikeController = require('../controllers/hikeController');
 
 //can use this type middleware to validate id
 // router.param('id', checkHikeId);
 
-router.route('/top-5-cheap').get(aliastopHikes, getAllHikes);
+router
+  .route('/top-5-cheap')
+  .get(hikeController.aliastopHikes, hikeController.getAllHikes);
 
-router.route('/hike-stats').get(getHikeStats);
+router.route('/hike-stats').get(hikeController.getHikeStats);
 
-router.route('/').get(getAllHikes).post(createHike);
+router.route('/monthy-plan/:year').get(hikeController.getMonthyPlan);
 
-router.route('/:id').get(getHike).patch(updateHike).delete(deleteHike);
+router
+  .route('/')
+  .get(hikeController.getAllHikes)
+  .post(hikeController.createHike);
+
+router
+  .route('/:id')
+  .get(hikeController.getHike)
+  .patch(hikeController.updateHike)
+  .delete(hikeController.deleteHike);
 
 module.exports = router;
