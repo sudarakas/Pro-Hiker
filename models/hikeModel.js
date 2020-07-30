@@ -97,7 +97,6 @@ const hikesScheme = new mongoose.Schema(
   }
 );
 
-
 //Document Middleware: Only runs before .save() and .create()
 hikesScheme.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
