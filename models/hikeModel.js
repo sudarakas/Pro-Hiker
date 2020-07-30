@@ -91,6 +91,13 @@ hikesScheme.pre(/^find/, function (next) {
   next();
 });
 
+//Aggregation Middleware
+hikesScheme.pre('aggregate', function (next) {
+  //add new condition to pipeline
+  this.pipeline().unshift({ $match: { secretHike: { $ne: true } } });
+  next();
+});
+
 //virtual properties
 hikesScheme.virtual('durationWeeks').get(function () {
   return this.duration / 7;
