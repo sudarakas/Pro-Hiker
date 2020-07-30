@@ -1,5 +1,6 @@
 const mongoose = require(`mongoose`);
 const slugify = require(`slugify`);
+// const validator = require('validator');
 
 //hikes scheme
 const hikesScheme = new mongoose.Schema(
@@ -9,6 +10,9 @@ const hikesScheme = new mongoose.Schema(
       required: [true, 'A hike must have a name'],
       unique: true,
       trim: true,
+      maxlength: [40, 'Hike name must have less or equal than 40 characters'],
+      minlength: [10, 'Hike name must have more or equal than 10 characters'],
+      //validate: [validator.isAlphanumeric, 'Hike name must b'],
     },
     slug: {
       type: String,
@@ -16,6 +20,8 @@ const hikesScheme = new mongoose.Schema(
     ratingAverage: {
       type: Number,
       default: 0.0,
+      min: [1, 'Rating must be greater than 1.0'],
+      max: [5, 'Rating must be less than 5.0'],
     },
     ratingQty: {
       type: Number,
@@ -36,6 +42,10 @@ const hikesScheme = new mongoose.Schema(
     difficulty: {
       type: String,
       required: [true, 'A hike must have a difficulty'],
+      enum: {
+        values: ['easy', 'medium', 'difficult', 'extreme'],
+        message: 'Invalid difficulty level is selected',
+      },
     },
     price: {
       type: Number,
@@ -43,6 +53,14 @@ const hikesScheme = new mongoose.Schema(
     },
     priceDiscount: {
       type: Number,
+      //this validation only for create not for update
+      validate: {
+        validator: function (value) {
+          return value < this.price;
+        },
+        message:
+          'Price discount ({VALUE}) must be less than the price of the hike',
+      },
     },
     description: {
       type: String,
@@ -78,6 +96,7 @@ const hikesScheme = new mongoose.Schema(
     toObject: { virtuals: true },
   }
 );
+
 
 //Document Middleware: Only runs before .save() and .create()
 hikesScheme.pre('save', function (next) {
