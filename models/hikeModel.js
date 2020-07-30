@@ -10,7 +10,7 @@ const hikesScheme = new mongoose.Schema(
       unique: true,
       trim: true,
     },
-    slug:{
+    slug: {
       type: String,
     },
     ratingAverage: {
@@ -68,6 +68,10 @@ const hikesScheme = new mongoose.Schema(
       select: false,
     },
     startDates: [Date],
+    secretHike: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     toJSON: { virtuals: true },
@@ -75,17 +79,17 @@ const hikesScheme = new mongoose.Schema(
   }
 );
 
-//document middleware: only runs before .save() and .create()
+//Document Middleware: Only runs before .save() and .create()
 hikesScheme.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
   next();
 });
 
-//document middleware: only runs after .save() and .create()
-// hikesScheme.post('save', function (doc, next) {
-//   console.log(doc);
-//   next();
-// });
+//Query Middleware
+hikesScheme.pre(/^find/, function (next) {
+  this.find({ secretHike: { $ne: true } });
+  next();
+});
 
 //virtual properties
 hikesScheme.virtual('durationWeeks').get(function () {
