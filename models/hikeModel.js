@@ -1,4 +1,5 @@
 const mongoose = require(`mongoose`);
+const slugify = require(`slugify`);
 
 //hikes scheme
 const hikesScheme = new mongoose.Schema(
@@ -8,6 +9,9 @@ const hikesScheme = new mongoose.Schema(
       required: [true, 'A hike must have a name'],
       unique: true,
       trim: true,
+    },
+    slug:{
+      type: String,
     },
     ratingAverage: {
       type: Number,
@@ -70,6 +74,18 @@ const hikesScheme = new mongoose.Schema(
     toObject: { virtuals: true },
   }
 );
+
+//document middleware: only runs before .save() and .create()
+hikesScheme.pre('save', function (next) {
+  this.slug = slugify(this.name, { lower: true });
+  next();
+});
+
+//document middleware: only runs after .save() and .create()
+// hikesScheme.post('save', function (doc, next) {
+//   console.log(doc);
+//   next();
+// });
 
 //virtual properties
 hikesScheme.virtual('durationWeeks').get(function () {
