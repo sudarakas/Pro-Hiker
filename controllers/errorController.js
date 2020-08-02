@@ -18,7 +18,6 @@ const sendErrorProduction = (err, res) => {
     });
     //unknown error: hide the error stack
   } else {
-    //console.error('ERROR', err);
     res.status(500).json({
       status: 'error',
       message: 'Something went wrong. Try Again',
@@ -36,6 +35,12 @@ const handleDuplicateFieldsDB = (error) => {
   return new AppError(message, 400);
 };
 
+const handleValidationErrorDB = (error) => {
+  const errors = Object.values(error.errors).map((element) => element.message);
+  const message = `Inavlid input data: ${errors.join('. ')}`;
+  return new AppError(message, 400);
+};
+
 module.exports = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
@@ -48,6 +53,7 @@ module.exports = (err, req, res, next) => {
 
     if (err.name === 'CastError') error = handleCastErrorDB(error);
     if (err.code === 11000) error = handleDuplicateFieldsDB(error);
+    if (err.name === 'ValidationError') error = handleValidationErrorDB(error);
 
     sendErrorProduction(error, res);
   }
