@@ -1,6 +1,7 @@
 const Hike = require('../models/hikeModel');
 const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
+const AppError = require('../utils/appError');
 
 //middleware for modify the route
 exports.aliastopHikes = (req, res, next) => {
@@ -46,6 +47,11 @@ exports.createHike = catchAsync(async (req, res, next) => {
 exports.getHike = catchAsync(async (req, res, next) => {
   const hike = await Hike.findById(req.params.id);
   // const hike = Hike.findOne({_id: req.params.id});
+
+  if (!hike) {
+    return next(new AppError('No hike found with the ID', 404));
+  }
+
   res.status(200).json({
     status: 'success',
     data: {
@@ -61,6 +67,10 @@ exports.updateHike = catchAsync(async (req, res, next) => {
     runValidators: true,
   });
 
+  if (!hike) {
+    return next(new AppError('No hike found with the ID', 404));
+  }
+
   res.status(200).json({
     status: 'success',
     data: {
@@ -71,7 +81,12 @@ exports.updateHike = catchAsync(async (req, res, next) => {
 
 //delete hike
 exports.deleteHike = catchAsync(async (req, res, next) => {
-  await Hike.findByIdAndDelete(req.params.id);
+  const hike = await Hike.findByIdAndDelete(req.params.id);
+
+  if (!hike) {
+    return next(new AppError('No hike found with the ID', 404));
+  }
+
   res.status(204).json({
     status: 'success',
     data: {
