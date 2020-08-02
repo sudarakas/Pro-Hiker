@@ -9,11 +9,6 @@ const sendErrorDevelopmnet = (err, res) => {
   });
 };
 
-const handleCastErrorDB = (error) => {
-  const message = `Invalid ${error.path}: ${error.value}`;
-  return new AppError(message, 400);
-};
-
 const sendErrorProduction = (err, res) => {
   //known error: infrom the client
   if (err.isOperational) {
@@ -31,6 +26,16 @@ const sendErrorProduction = (err, res) => {
   }
 };
 
+const handleCastErrorDB = (error) => {
+  const message = `Invalid ${error.path}: ${error.value}`;
+  return new AppError(message, 400);
+};
+
+const handleDuplicateFieldsDB = (error) => {
+  const message = `Duplicate field value: ${error.keyValue.name}. Please use another value`;
+  return new AppError(message, 400);
+};
+
 module.exports = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
@@ -42,6 +47,8 @@ module.exports = (err, req, res, next) => {
     let error = { ...err };
 
     if (err.name === 'CastError') error = handleCastErrorDB(error);
+    if (err.code === 11000) error = handleDuplicateFieldsDB(error);
+
     sendErrorProduction(error, res);
   }
 };
