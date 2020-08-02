@@ -1,5 +1,6 @@
 const Hike = require('../models/hikeModel');
 const APIFeatures = require('../utils/apiFeatures');
+const catchAsync = require('../utils/catchAsync');
 
 //middleware for modify the route
 exports.aliastopHikes = (req, res, next) => {
@@ -10,198 +11,149 @@ exports.aliastopHikes = (req, res, next) => {
 };
 
 //get all hikes
-exports.getAllHikes = async (req, res) => {
-  try {
-    //execute the query
-    const feature = new APIFeatures(Hike.find(), req.query)
-      .filter()
-      .sort()
-      .limitFields()
-      .paginate();
-    const hikes = await feature.query;
+exports.getAllHikes = catchAsync(async (req, res, next) => {
+  //execute the query
+  const feature = new APIFeatures(Hike.find(), req.query)
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
+  const hikes = await feature.query;
 
-    //send the response
-    res.status(200).json({
-      status: 'success',
-      result: hikes.length,
-      data: {
-        hikes: hikes,
-      },
-    });
-  } catch (error) {
-    res.status(404).json({
-      status: 'fail',
-      message: error,
-    });
-  }
-};
+  //send the response
+  res.status(200).json({
+    status: 'success',
+    result: hikes.length,
+    data: {
+      hikes: hikes,
+    },
+  });
+});
 
 //add new hike
-exports.createHike = async (req, res) => {
-  try {
-    const newHike = await Hike.create(req.body);
+exports.createHike = catchAsync(async (req, res, next) => {
+  const newHike = await Hike.create(req.body);
 
-    res.status(201).json({
-      status: 'success',
-      data: {
-        tour: newHike,
-      },
-    });
-  } catch (error) {
-    res.status(400).json({
-      status: 'fail',
-      message: error,
-    });
-  }
-};
+  res.status(201).json({
+    status: 'success',
+    data: {
+      tour: newHike,
+    },
+  });
+});
 
 //get a hike
-exports.getHike = async (req, res) => {
-  try {
-    const hike = await Hike.findById(req.params.id);
-    // const hike = Hike.findOne({_id: req.params.id});
-    res.status(200).json({
-      status: 'success',
-      data: {
-        tour: hike,
-      },
-    });
-  } catch (error) {
-    res.status(404).json({
-      status: 'fail',
-      message: error,
-    });
-  }
-};
+exports.getHike = catchAsync(async (req, res, next) => {
+  const hike = await Hike.findById(req.params.id);
+  // const hike = Hike.findOne({_id: req.params.id});
+  res.status(200).json({
+    status: 'success',
+    data: {
+      tour: hike,
+    },
+  });
+});
 
 //update hike
-exports.updateHike = async (req, res) => {
-  try {
-    const hike = await Hike.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+exports.updateHike = catchAsync(async (req, res, next) => {
+  const hike = await Hike.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
 
-    res.status(200).json({
-      status: 'success',
-      data: {
-        hike: hike,
-      },
-    });
-  } catch (error) {
-    res.status(404).json({
-      status: 'fail',
-      message: error,
-    });
-  }
-};
+  res.status(200).json({
+    status: 'success',
+    data: {
+      hike: hike,
+    },
+  });
+});
 
 //delete hike
-exports.deleteHike = async (req, res) => {
-  try {
-    await Hike.findByIdAndDelete(req.params.id);
-    res.status(204).json({
-      status: 'success',
-      data: {
-        hike: null,
-      },
-    });
-  } catch (error) {
-    res.status(404).json({
-      status: 'fail',
-      message: error,
-    });
-  }
-};
+exports.deleteHike = catchAsync(async (req, res, next) => {
+  await Hike.findByIdAndDelete(req.params.id);
+  res.status(204).json({
+    status: 'success',
+    data: {
+      hike: null,
+    },
+  });
+});
 
-exports.getHikeStats = async (req, res) => {
-  try {
-    const stats = await Hike.aggregate([
-      {
-        $match: { ratingAverage: { $gte: 0.0 } },
+exports.getHikeStats = catchAsync(async (req, res, next) => {
+  const stats = await Hike.aggregate([
+    {
+      $match: { ratingAverage: { $gte: 0.0 } },
+    },
+    {
+      $group: {
+        _id: { $toUpper: '$difficulty' },
+        numHikes: { $sum: 1 }, //each object will add 1
+        numRating: { $sum: '$ratingQty' },
+        averageRating: { $avg: '$ratingAverage' },
+        averagePrice: { $avg: '$price' },
+        minPrice: { $min: '$price' },
+        maxPrice: { $max: '$price' },
       },
-      {
-        $group: {
-          _id: { $toUpper: '$difficulty' },
-          numHikes: { $sum: 1 }, //each object will add 1
-          numRating: { $sum: '$ratingQty' },
-          averageRating: { $avg: '$ratingAverage' },
-          averagePrice: { $avg: '$price' },
-          minPrice: { $min: '$price' },
-          maxPrice: { $max: '$price' },
+    },
+    {
+      $sort: { minPrice: 1 },
+    },
+    // {
+    //   $match: { _id: { $ne: 'HARD' } },
+    // },
+  ]);
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      stats,
+    },
+  });
+});
+
+exports.getMonthyPlan = catchAsync(async (req, res, next) => {
+  const year = req.params.year * 1;
+
+  const plan = await Hike.aggregate([
+    {
+      $unwind: '$startDates', //seperate record per each elemenets of the array
+    },
+    {
+      $match: {
+        startDates: {
+          $gte: new Date(`${year}-01-01`),
+          $lte: new Date(`${year}-12-31`),
         },
       },
-      {
-        $sort: { minPrice: 1 },
+    },
+    {
+      $group: {
+        _id: { $month: '$startDates' },
+        numHikesStarts: { $sum: 1 },
+        hikes: { $push: '$name' }, //add the hike name to result
       },
-      // {
-      //   $match: { _id: { $ne: 'HARD' } },
-      // },
-    ]);
+    },
+    {
+      $addFields: { month: '$_id' },
+    },
+    {
+      $project: {
+        _id: 0, //hide the fields in the result
+      },
+    },
+    {
+      $sort: { numHikesStarts: 1 },
+    },
+    {
+      $limit: 12,
+    },
+  ]);
 
-    res.status(200).json({
-      status: 'success',
-      data: {
-        stats,
-      },
-    });
-  } catch (error) {
-    res.status(404).json({
-      status: 'fail',
-      message: error,
-    });
-  }
-};
-
-exports.getMonthyPlan = async (req, res) => {
-  try {
-    const year = req.params.year * 1;
-
-    const plan = await Hike.aggregate([
-      {
-        $unwind: '$startDates', //seperate record per each elemenets of the array
-      },
-      {
-        $match: {
-          startDates: {
-            $gte: new Date(`${year}-01-01`),
-            $lte: new Date(`${year}-12-31`),
-          },
-        },
-      },
-      {
-        $group: {
-          _id: { $month: '$startDates' },
-          numHikesStarts: { $sum: 1 },
-          hikes: { $push: '$name' }, //add the hike name to result
-        },
-      },
-      {
-        $addFields: { month: '$_id' },
-      },
-      {
-        $project: {
-          _id: 0, //hide the fields in the result
-        },
-      },
-      {
-        $sort: { numHikesStarts: 1 },
-      },
-      {
-        $limit: 12,
-      },
-    ]);
-
-    res.status(200).json({
-      status: 'success',
-      data: {
-        plan,
-      },
-    });
-  } catch (error) {
-    res.status(404).json({
-      status: 'fail',
-      message: error,
-    });
-  }
-};
+  res.status(200).json({
+    status: 'success',
+    data: {
+      plan,
+    },
+  });
+});
