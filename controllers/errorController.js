@@ -1,3 +1,5 @@
+const AppError = require('../utils/appError');
+
 const sendErrorDevelopmnet = (err, res) => {
   res.status(err.statusCode).json({
     status: err.status,
@@ -5,6 +7,11 @@ const sendErrorDevelopmnet = (err, res) => {
     message: err.message,
     stack: err.stack,
   });
+};
+
+const handleCastErrorDB = (error) => {
+  const message = `Invalid ${error.path}: ${error.value}`;
+  return new AppError(message, 400);
 };
 
 const sendErrorProduction = (err, res) => {
@@ -16,7 +23,7 @@ const sendErrorProduction = (err, res) => {
     });
     //unknown error: hide the error stack
   } else {
-    console.error('ERROR', err);
+    //console.error('ERROR', err);
     res.status(500).json({
       status: 'error',
       message: 'Something went wrong. Try Again',
@@ -32,6 +39,9 @@ module.exports = (err, req, res, next) => {
   if (process.env.NODE_ENV === 'development') {
     sendErrorDevelopmnet(err, res);
   } else if (process.env.NODE_ENV === 'production') {
-    sendErrorProduction(err, res);
+    let error = { ...err };
+
+    if (err.name === 'CastError') error = handleCastErrorDB(error);
+    sendErrorProduction(error, res);
   }
 };
