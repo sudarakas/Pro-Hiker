@@ -2,6 +2,16 @@
 /* eslint-disable no-unused-vars */
 const dotenv = require(`dotenv`);
 const mongoose = require(`mongoose`);
+
+//for uncaught exception
+process.on('uncaughtException', (error) =>{
+  console.log(`Error: ${error.name}, Info: ${error.message}`);
+  console.log('Server Shutting Down!');
+
+  //terminate the server
+  process.exit(1);
+});
+
 dotenv.config({ path: `./config.env` });
 const app = require(`./app`);
 
