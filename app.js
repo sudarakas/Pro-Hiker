@@ -18,7 +18,6 @@ if (process.env.NODE_ENV === 'development') {
 app.use(express.json()); //convert json to js obj
 app.use(express.static(`${__dirname}/public`)); //access static contentes from public
 app.use((req, res, next) => {
-  console.log('went through the middleware');
   next();
 });
 
