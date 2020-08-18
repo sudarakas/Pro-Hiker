@@ -2,6 +2,7 @@ const express = require('express');
 
 const router = express.Router();
 const hikeController = require('../controllers/hikeController');
+const authController = require('../controllers/authController');
 
 //can use this type middleware to validate id
 // router.param('id', checkHikeId);
@@ -16,7 +17,7 @@ router.route('/monthy-plan/:year').get(hikeController.getMonthyPlan);
 
 router
   .route('/')
-  .get(hikeController.getAllHikes)
+  .get(authController.protect, hikeController.getAllHikes)
   .post(hikeController.createHike);
 
 router

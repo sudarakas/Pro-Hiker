@@ -3,6 +3,7 @@ const User = require('../models/userModel');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 
+//generate the token
 const signTokenGenerator = (id) => {
   return jwt.sign({ id: id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
@@ -10,6 +11,7 @@ const signTokenGenerator = (id) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
+  //set the model values
   const newUser = await User.create({
     name: req.body.name,
     email: req.body.email,
@@ -46,4 +48,27 @@ exports.signin = catchAsync(async (req, res, next) => {
     status: 'success',
     token,
   });
+});
+
+exports.protect = catchAsync(async (req, res, next) => {
+  //get the token
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+
+  //check the token is exits in request
+  if (!token) {
+    return next(
+      new AppError('You are not signed in! Please sign in to get access.')
+    );
+  }
+
+  //verify the jwt token
+  //check the user exists
+  //check the user password with the token(if changed)
+  next();
 });
