@@ -34,7 +34,7 @@ const userScheme = new mongoose.Schema(
         message: 'Confirm password does not matched',
       },
     },
-    passwordChangedAt: { Date },
+    passwordChangedAt: Date,
   },
   {
     toJSON: { virtuals: true },
@@ -60,10 +60,17 @@ userScheme.methods.correctPassword = async function (
   return await bcrypt.compare(candidatePassword, userPassword);
 };
 
-userScheme.method.changePassowrdAfter = function (JWTTimestamp) {
+userScheme.methods.changePassowrdAfter = function (JWTTimestamp) {
   if (this.passwordChangedAt) {
-    console.log(this.passwordChangedAt, JWTTimestamp);
+    const changeTimestamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10
+    ); // convert the date to timestamp (in seconds)
+
+    //If password has been changed after token generation
+    return JWTTimestamp < changeTimestamp;
   }
+  //If password is not changed
   return false;
 };
 
