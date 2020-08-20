@@ -1,3 +1,4 @@
+const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const AppError = require('../utils/appError');
@@ -17,6 +18,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     email: req.body.email,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
+    passwordChangedAt: req.body.passwordChangedAt,
   });
 
   const token = signTokenGenerator(newUser._id);
@@ -63,12 +65,29 @@ exports.protect = catchAsync(async (req, res, next) => {
   //check the token is exits in request
   if (!token) {
     return next(
-      new AppError('You are not signed in! Please sign in to get access.')
+      new AppError('You are not signed in! Please sign in to get access.', 401)
     );
   }
 
   //verify the jwt token
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
   //check the user exists
+  const user = await User.findById(decoded.id); //check the user id is exists.
+  if (!user) {
+    return next(
+      new AppError('User does not exist! Please sign up to get access.', 401)
+    );
+  }
+
   //check the user password with the token(if changed)
+  if (user.changePassowrdAfter(decoded.iat)) {
+    return next(
+      new AppError('You are using an older password! Please sign in agian', 401)
+    );
+  }
+
+  //grant access to protected route
+  req.user = user;
   next();
 });
