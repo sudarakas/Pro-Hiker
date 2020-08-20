@@ -34,6 +34,7 @@ const userScheme = new mongoose.Schema(
         message: 'Confirm password does not matched',
       },
     },
+    passwordChangedAt: { Date },
   },
   {
     toJSON: { virtuals: true },
@@ -57,6 +58,13 @@ userScheme.methods.correctPassword = async function (
   userPassword
 ) {
   return await bcrypt.compare(candidatePassword, userPassword);
+};
+
+userScheme.method.changePassowrdAfter = function (JWTTimestamp) {
+  if (this.passwordChangedAt) {
+    console.log(this.passwordChangedAt, JWTTimestamp);
+  }
+  return false;
 };
 
 //export the user model
