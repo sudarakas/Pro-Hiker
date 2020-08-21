@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
@@ -39,9 +40,9 @@ const userScheme = new mongoose.Schema(
         message: 'Confirm password does not matched',
       },
     },
-    passwordChangedAt: {
-      type: Date,
-    },
+    passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetExpires: Date,
   },
   {
     toJSON: { virtuals: true },
@@ -79,6 +80,23 @@ userScheme.methods.changePassowrdAfter = function (JWTTimestamp) {
   }
   //If password is not changed
   return false;
+};
+
+userScheme.methods.createPasswordResetToken = function () {
+  //Generate random string
+  const resetToken = crypto.randomBytes(32).toString('hex');
+
+  //Encrypt the reset token before store on DB
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  //Updatet he reset token expire period (15 Minutes)
+  this.passwordResetExpires = Date.now() + 15 * 60 * 1000;
+
+  //Return the plaintext reset token to user
+  return resetToken;
 };
 
 //export the user model

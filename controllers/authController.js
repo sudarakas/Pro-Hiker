@@ -4,7 +4,7 @@ const User = require('../models/userModel');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 
-//generate the token
+//Generate the token
 const signTokenGenerator = (id) => {
   return jwt.sign({ id: id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
@@ -12,7 +12,7 @@ const signTokenGenerator = (id) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
-  //set the model values
+  //Set the model values
   const newUser = await User.create({
     name: req.body.name,
     email: req.body.email,
@@ -35,17 +35,17 @@ exports.signup = catchAsync(async (req, res, next) => {
 
 exports.signin = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
-  //check the email & password entered
+  //Check the email & password entered
   if (!email || !password) {
     return next(new AppError('Please provide email and password!', 400));
   }
-  //check the login details with db
+  //Check the login details with db
   const user = await User.findOne({ email }).select('+password');
 
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError('Invalid email or password!', 401));
   }
-  //send the jwt token to client
+  //Send the jwt token to client
   const token = signTokenGenerator(user._id);
   res.status(200).json({
     status: 'success',
@@ -54,7 +54,7 @@ exports.signin = catchAsync(async (req, res, next) => {
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
-  //get the token
+  //Get the token
   let token;
   if (
     req.headers.authorization &&
@@ -63,17 +63,17 @@ exports.protect = catchAsync(async (req, res, next) => {
     token = req.headers.authorization.split(' ')[1];
   }
 
-  //check the token is exits in request
+  //Check the token is exits in request
   if (!token) {
     return next(
       new AppError('You are not signed in! Please sign in to get access.', 401)
     );
   }
 
-  //verify the jwt token
+  //Verify the jwt token
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
-  //check the user exists
+  //Check the user exists
   const currentUser = await User.findById(decoded.id); //check the user id is exists.
   if (!currentUser) {
     return next(
@@ -81,19 +81,19 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
 
-  //check the user password with the token(if changed)
+  //Check the user password with the token(if changed)
   if (currentUser.changePassowrdAfter(decoded.iat)) {
     return next(
       new AppError('You are using an older password! Please sign in agian', 401)
     );
   }
 
-  //grant access to protected route
+  //Grant access to protected route
   req.user = currentUser;
   next();
 });
 
-//restrict the access permissions
+//Restrict the access permissions
 exports.restrictTo = (...roles) => {
   //roles ['admin', 'guide']
   return (req, res, next) => {
@@ -105,3 +105,23 @@ exports.restrictTo = (...roles) => {
     next();
   };
 };
+
+//Forget password and send reset token
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+  //Get the user from email
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) {
+    return next(new AppError('There is no user with the email address', 404));
+  }
+
+  //Generate the random reset token
+  const resetToken = user.createPasswordResetToken();
+
+  //Update the user model with the reset token info
+  await user.save({ validateBeforeSave: false });
+
+  //Send the token to user email
+});
+
+//Reset the user password
+exports.resetPassword = (req, res, next) => {};
