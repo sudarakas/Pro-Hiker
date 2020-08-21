@@ -18,6 +18,11 @@ const userScheme = new mongoose.Schema(
     photo: {
       type: String,
     },
+    role: {
+      type: String,
+      enum: ['user', 'guide', 'lead-guide', 'admin'],
+      default: 'user',
+    },
     password: {
       type: String,
       required: [true, 'Please enter a password'],
@@ -34,7 +39,9 @@ const userScheme = new mongoose.Schema(
         message: 'Confirm password does not matched',
       },
     },
-    passwordChangedAt: Date,
+    passwordChangedAt: {
+      type: Date,
+    },
   },
   {
     toJSON: { virtuals: true },
