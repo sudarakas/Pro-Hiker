@@ -24,6 +24,10 @@ router
   .route('/:id')
   .get(hikeController.getHike)
   .patch(hikeController.updateHike)
-  .delete(hikeController.deleteHike);
+  .delete(
+    authController.protect,
+    authController.restrictTo('admin', 'lead-guide'),
+    hikeController.deleteHike
+  );
 
 module.exports = router;
