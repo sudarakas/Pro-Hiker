@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
@@ -133,7 +134,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   try {
     await sendEmail({
       email: user.email,
-      subject: 'ProHiker Acccount - Passwrod Reset',
+      subject: 'ProHiker Acccount - Password Reset',
       message,
     });
 
@@ -153,4 +154,36 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 });
 
 //Reset the user password
-exports.resetPassword = (req, res, next) => {};
+exports.resetPassword = catchAsync(async (req, res, next) => {
+  //Encrypt the plain token
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(req.params.token)
+    .digest('hex');
+
+  //Get the current user using the token
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+
+  //If token is valid, and user is available, update the password
+  if (!user)
+    return next(new AppError('Token is invalid or expired! Try again.', 400));
+     
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+
+  await user.save();
+  //Update the passwordChangedAt on user model
+
+  //Sign in the user, send JWT token
+  const token = signTokenGenerator(user._id);
+
+  res.status(200).json({
+    status: 'success',
+    token,
+  });
+});
