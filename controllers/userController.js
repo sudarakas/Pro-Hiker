@@ -48,6 +48,17 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.deleteProfile = catchAsync(async (req, res, next) => {
+  //Find the user and set the active feild FALSE
+  await User.findByIdAndUpdate(req.user.id, { active: false });
+
+  //Send the response
+  res.status(204).json({
+    status: 'success',
+    data: null,
+  });
+});
+
 exports.getUser = (req, res) => {
   res.status(500).json({
     status: 'Server Issue',

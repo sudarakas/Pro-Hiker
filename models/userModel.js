@@ -43,6 +43,11 @@ const userScheme = new mongoose.Schema(
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,
+    active: {
+      type: Boolean,
+      default: true,
+      select: false,
+    },
   },
   {
     toJSON: { virtuals: true },
@@ -67,6 +72,13 @@ userScheme.pre('save', function (next) {
 
   //Update the passwordChangedAt, reduce 1second to elimanate the DB saving delay.
   this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
+//Display only ACTIVE users
+userScheme.pre(/^find/, function (next) {
+  //modify the query to neglate non active users
+  this.find({ active: { $ne: false } });
   next();
 });
 
