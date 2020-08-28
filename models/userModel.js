@@ -43,6 +43,11 @@ const userScheme = new mongoose.Schema(
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,
+    active: {
+      type: Boolean,
+      default: true,
+      select: false,
+    },
   },
   {
     toJSON: { virtuals: true },
@@ -51,13 +56,29 @@ const userScheme = new mongoose.Schema(
 );
 
 userScheme.pre('save', async function (next) {
-  //if password not modified
+  //If password not modified
   if (!this.isModified('password')) return next();
-  //if password is modified encrypt it
+  //If password is modified encrypt it
   this.password = await bcrypt.hash(this.password, 12);
 
-  //delete the confirm password field
+  //Delete the confirm password field
   this.passwordConfirm = undefined;
+  next();
+});
+
+userScheme.pre('save', function (next) {
+  //If password is modified or new record
+  if (!this.isModified('password') || this.isNew) return next();
+
+  //Update the passwordChangedAt, reduce 1second to elimanate the DB saving delay.
+  this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
+//Display only ACTIVE users
+userScheme.pre(/^find/, function (next) {
+  //modify the query to neglate non active users
+  this.find({ active: { $ne: false } });
   next();
 });
 
