@@ -61,10 +61,10 @@ userScheme.pre('save', async function (next) {
   next();
 });
 
-userScheme.pre('save', function (next){
+userScheme.pre('save', function (next) {
   //If password is modified or new record
   if (!this.isModified('password') || this.isNew) return next();
-  
+
   //Update the passwordChangedAt, reduce 1second to elimanate the DB saving delay.
   this.passwordChangedAt = Date.now() - 1000;
   next();

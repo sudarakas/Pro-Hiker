@@ -170,7 +170,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   //If token is valid, and user is available, update the password
   if (!user)
     return next(new AppError('Token is invalid or expired! Try again.', 400));
-     
+
   user.password = req.body.password;
   user.passwordConfirm = req.body.passwordConfirm;
   user.passwordResetToken = undefined;
