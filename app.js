@@ -2,6 +2,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 
 const AppError = require('./utils/appError');
 
@@ -12,10 +13,16 @@ const userRouter = require('./routes/userRoutes');
 const app = express();
 
 //Middlewares
+
+//Security HTTP headers
+app.use(helmet());
+
+//Development Support
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
+//Limit the number of requests
 const apiLimiter = rateLimit({
   windowMs: 30 * 60 * 1000, // 30 minutes
   max: 2, // limit each IP to 100 requests per windowMs
@@ -24,17 +31,19 @@ const apiLimiter = rateLimit({
 });
 
 app.use('/api', apiLimiter);
-app.use(express.json()); //convert json to js obj
+app.use(express.json({ limit: '10kb' })); //convert json to js obj
 app.use(express.static(`${__dirname}/public`)); //access static contentes from public
+
+//Test
 app.use((req, res, next) => {
   next();
 });
 
-//routes
+//Routes
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/hikes', hikeRouter);
 
-//for all undefined routes
+//For all undefined routes
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on the server`, 404));
 });
