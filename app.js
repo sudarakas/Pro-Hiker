@@ -3,6 +3,9 @@ const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
+cont hpp = require('hpp');
 
 const AppError = require('./utils/appError');
 
@@ -31,8 +34,23 @@ const apiLimiter = rateLimit({
 });
 
 app.use('/api', apiLimiter);
-app.use(express.json({ limit: '10kb' })); //convert json to js obj
-app.use(express.static(`${__dirname}/public`)); //access static contentes from public
+
+//Body parser, reading data from body (convert json to js obj)
+app.use(express.json({ limit: '10kb' }));
+
+//Data Sanitization - NOSQL Query Injection
+app.use(mongoSanitize());
+
+//Data Sanitization - XSS
+app.use(xss());
+
+//Prevent parameter pollution
+app.use(hpp({
+  whitelist: [ 'duration', 'difficulty', 'maxGroupSize', 'ratingQty', 'ratingAverage' ]
+}));
+
+//Access static contentes from public
+app.use(express.static(`${__dirname}/public`)); 
 
 //Test
 app.use((req, res, next) => {
