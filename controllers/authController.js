@@ -13,6 +13,36 @@ const signTokenGenerator = (id) => {
   });
 };
 
+//Send the token
+const createSendToken = (user, statusCode, res) => {
+  const token = signTokenGenerator(user._id);
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    secure: false,
+    httpOnly: true,
+  };
+
+  //Set secure true in production env
+  if (process.env.NODE_ENV === 'producation') cookieOptions.secure = true;
+
+  //Attach the token with COOKIE
+  res.cookie('jwt', token, cookieOptions);
+
+  //Hide the password from the output
+  user.password = undefined;
+
+  //Send the response
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data: {
+      user,
+    },
+  });
+};
+
 exports.signup = catchAsync(async (req, res, next) => {
   //Set the model values
   const newUser = await User.create({
@@ -24,15 +54,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     role: req.body.role,
   });
 
-  const token = signTokenGenerator(newUser._id);
-
-  res.status(201).json({
-    status: 'success',
-    token,
-    data: {
-      user: newUser,
-    },
-  });
+  createSendToken(newUser, 201, res);
 });
 
 exports.signin = catchAsync(async (req, res, next) => {
@@ -48,11 +70,7 @@ exports.signin = catchAsync(async (req, res, next) => {
     return next(new AppError('Invalid email or password!', 401));
   }
   //Send the jwt token to client
-  const token = signTokenGenerator(user._id);
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  createSendToken(user, 200, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
