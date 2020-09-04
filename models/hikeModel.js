@@ -89,9 +89,33 @@ const hikesScheme = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    startLocation: {
+      //Geo-JSON
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point'],
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enm: ['Point'],
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
   },
   {
-    toJSON: { virtuals: true },
+    toJSON: { virtuals: true }, //to select the virtual objetcs
     toObject: { virtuals: true },
   }
 );
