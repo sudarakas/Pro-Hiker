@@ -28,7 +28,7 @@ if (process.env.NODE_ENV === 'development') {
 //Limit the number of requests
 const apiLimiter = rateLimit({
   windowMs: 30 * 60 * 1000, // 30 minutes
-  max: 2, // limit each IP to 100 requests per windowMs
+  max: 100, // limit each IP to 100 requests per windowMs
   message:
     'Too many requests received from this IP, please try again after an half hour',
 });
@@ -36,7 +36,7 @@ const apiLimiter = rateLimit({
 app.use('/api', apiLimiter);
 
 //Body parser, reading data from body (convert json to js obj)
-app.use(express.json({ limit: '10kb' }));
+app.use(express.json({ limit: '20kb' }));
 
 //Data Sanitization - NOSQL Query Injection
 app.use(mongoSanitize());

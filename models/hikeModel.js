@@ -1,5 +1,6 @@
 const mongoose = require(`mongoose`);
 const slugify = require(`slugify`);
+//const User = require('./userModel');
 
 //hikes scheme
 const hikesScheme = new mongoose.Schema(
@@ -113,6 +114,7 @@ const hikesScheme = new mongoose.Schema(
         day: Number,
       },
     ],
+    guides: [{ type: mongoose.Schema.ObjectId, ref: 'User' }],
   },
   {
     toJSON: { virtuals: true }, //to select the virtual objetcs
@@ -125,6 +127,20 @@ hikesScheme.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
   next();
 });
+
+/*
+  Embeding Example - Data Modeling
+*/
+//Set the User Models to the hike
+// hikesScheme.pre('save', async function (next) {
+//   //Get the User Models - Return Promise Array
+//   const guidesPromises = this.guides.map(async (id) => await User.findById(id));
+
+//   //guidesPromises Array will be resolved here
+//   this.guides = await Promise.all(guidesPromises);
+
+//   next();
+// });
 
 //Query Middleware
 hikesScheme.pre(/^find/, function (next) {
