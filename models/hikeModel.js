@@ -128,6 +128,16 @@ hikesScheme.pre('save', function (next) {
   next();
 });
 
+//Populate the ref fields
+hikesScheme.pre(/^find/, function (next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangedAt',
+  });
+
+  next();
+});
+
 /*
   Embeding Example - Data Modeling
 */
