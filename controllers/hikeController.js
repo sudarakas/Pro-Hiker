@@ -38,7 +38,7 @@ exports.createHike = catchAsync(async (req, res, next) => {
   res.status(201).json({
     status: 'success',
     data: {
-      tour: newHike,
+      hike: newHike,
     },
   });
 });
@@ -55,7 +55,7 @@ exports.getHike = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     data: {
-      tour: hike,
+      hike: hike,
     },
   });
 });
