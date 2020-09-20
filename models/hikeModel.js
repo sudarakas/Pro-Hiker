@@ -21,7 +21,7 @@ const hikesScheme = new mongoose.Schema(
       type: Number,
       default: 0.0,
       min: [1, 'Rating must be greater than 1.0'],
-      max: [5, 'Rating must be less than 5.0'],
+      max: [10, 'Rating must be less than 10.0'],
     },
     ratingQty: {
       type: Number,
@@ -122,6 +122,19 @@ const hikesScheme = new mongoose.Schema(
   }
 );
 
+//virtual properties
+hikesScheme.virtual('durationWeeks').get(function () {
+  return this.duration / 7;
+});
+
+//Populate reviews
+hikesScheme.virtual('reviews', {
+  ref: 'Review',
+  localField: '_id',
+  foreignField: 'hike',
+  justOne: false,
+});
+
 //Document Middleware: Only runs before .save() and .create()
 hikesScheme.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
@@ -163,11 +176,6 @@ hikesScheme.pre('aggregate', function (next) {
   //add new condition to pipeline
   this.pipeline().unshift({ $match: { secretHike: { $ne: true } } });
   next();
-});
-
-//virtual properties
-hikesScheme.virtual('durationWeeks').get(function () {
-  return this.duration / 7;
 });
 
 //create the model with scheme
