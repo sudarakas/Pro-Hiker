@@ -36,6 +36,19 @@ const reviewScheme = new mongoose.Schema(
   }
 );
 
+//Populating the ref field
+reviewScheme.pre(/^find/, function (next) {
+  this.populate({
+    path: 'hike',
+    select: 'name',
+  }).populate({
+    path: 'user',
+    select: 'name photo',
+  });
+
+  next();
+});
+
 //Create the model with scheme
 const Review = mongoose.model('Review', reviewScheme);
 
