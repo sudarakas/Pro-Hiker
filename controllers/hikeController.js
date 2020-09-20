@@ -45,7 +45,7 @@ exports.createHike = catchAsync(async (req, res, next) => {
 
 //get a hike
 exports.getHike = catchAsync(async (req, res, next) => {
-  const hike = await Hike.findById(req.params.id);
+  const hike = await Hike.findById(req.params.id).populate('reviews');
   // const hike = Hike.findOne({_id: req.params.id});
 
   if (!hike) {
