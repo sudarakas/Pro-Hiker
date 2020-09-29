@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const hikeController = require('../controllers/hikeController');
 const authController = require('../controllers/authController');
+const reviewController = require('../controllers/reviewController');
 
 //can use this type middleware to validate id
 // router.param('id', checkHikeId);
@@ -28,6 +29,14 @@ router
     authController.protect,
     authController.restrictTo('admin', 'lead-guide'),
     hikeController.deleteHike
+  );
+
+router
+  .route('/:hikeId/reviews')
+  .post(
+    authController.protect,
+    authController.restrictTo('user'),
+    reviewController.createReview
   );
 
 module.exports = router;

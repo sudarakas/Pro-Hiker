@@ -19,6 +19,11 @@ exports.getAllReviews = catchAsync(async (req, res, next) => {
 
 //Create new review
 exports.createReview = catchAsync(async (req, res, next) => {
+  //Allow nested routes
+  //Set the hike from the params if the id is not available in body
+  if (!req.body.hike) req.body.hike = req.params.hikeId;
+  //Set the user from the params if the id is not available in body
+  if (!req.body.user) req.body.user = req.user.id;
   const newReview = await Review.create(req.body);
 
   //Send the response
