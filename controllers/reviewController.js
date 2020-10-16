@@ -5,7 +5,13 @@ const catchAsync = require('../utils/catchAsync');
 
 //Get all reviews
 exports.getAllReviews = catchAsync(async (req, res, next) => {
-  const reviews = await Review.find();
+
+  //Create the filter
+  let filter = {};
+  //If req URL contains a hike id, filter hike
+  if (req.params.hikeId) filter = { hike: req.params.hikeId };
+  //Apply the filter
+  const reviews = await Review.find(filter);
 
   //Send the response
   res.status(200).json({
