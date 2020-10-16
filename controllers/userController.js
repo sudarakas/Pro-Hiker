@@ -1,7 +1,7 @@
 const User = require('../models/userModel');
-//const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const handlerFactory = require('./handlerFactory');
 
 const filterObject = (object, ...fields) => {
   const updatedObject = {};
@@ -77,8 +77,5 @@ exports.updateUser = (req, res) => {
   });
 };
 
-exports.deleteUser = (req, res) => {
-  res.status(500).json({
-    status: 'Server Issue',
-  });
-};
+//Delete user
+exports.deleteUser = handlerFactory.deleteOne(User);

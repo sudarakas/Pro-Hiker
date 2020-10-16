@@ -2,6 +2,7 @@ const Hike = require('../models/hikeModel');
 const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const handlerFactory = require('./handlerFactory');
 
 //middleware for modify the route
 exports.aliastopHikes = (req, res, next) => {
@@ -43,7 +44,7 @@ exports.createHike = catchAsync(async (req, res, next) => {
   });
 });
 
-//get a hike
+//Get a hike
 exports.getHike = catchAsync(async (req, res, next) => {
   const hike = await Hike.findById(req.params.id).populate('reviews');
   // const hike = Hike.findOne({_id: req.params.id});
@@ -60,7 +61,7 @@ exports.getHike = catchAsync(async (req, res, next) => {
   });
 });
 
-//update hike
+//Update hike
 exports.updateHike = catchAsync(async (req, res, next) => {
   const hike = await Hike.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
@@ -79,22 +80,25 @@ exports.updateHike = catchAsync(async (req, res, next) => {
   });
 });
 
-//delete hike
-exports.deleteHike = catchAsync(async (req, res, next) => {
-  const hike = await Hike.findByIdAndDelete(req.params.id);
+//Delete hike
+exports.deleteHike = handlerFactory.deleteOne(Hike);
 
-  if (!hike) {
-    return next(new AppError('No hike found with the ID', 404));
-  }
+// exports.deleteHike = catchAsync(async (req, res, next) => {
+//   const hike = await Hike.findByIdAndDelete(req.params.id);
 
-  res.status(204).json({
-    status: 'success',
-    data: {
-      hike: null,
-    },
-  });
-});
+//   if (!hike) {
+//     return next(new AppError('No hike found with the ID', 404));
+//   }
 
+//   res.status(204).json({
+//     status: 'success',
+//     data: {
+//       hike: null,
+//     },
+//   });
+// });
+
+//Get the hike status
 exports.getHikeStats = catchAsync(async (req, res, next) => {
   const stats = await Hike.aggregate([
     {
