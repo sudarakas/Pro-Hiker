@@ -19,7 +19,7 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
     status: 'success',
     result: hikes.length,
     data: {
-      hikes: hikes,
+      data: hikes,
     },
   });
 });
@@ -59,17 +59,11 @@ exports.deleteProfile = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getUser = (req, res) => {
-  res.status(500).json({
-    status: 'Server Issue',
-  });
-};
-
+//Get user
+exports.getUser = handlerFactory.getOne(User);
 //Create user
 exports.createUser = handlerFactory.createOne(User);
-
 //Update user
 exports.updateUser = handlerFactory.updateOne(User);
-
 //Delete user
 exports.deleteUser = handlerFactory.deleteOne(User);

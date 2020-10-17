@@ -29,7 +29,8 @@ exports.setHikeUserIds = (req, res, next) => {
   if (!req.body.user) req.body.user = req.user.id;
   next();
 };
-
+//Get Review
+exports.getReview = handlerFactory.getOne(Review);
 //Create new review
 exports.createReview = handlerFactory.createOne(Review);
 //Update Review

@@ -49,12 +49,30 @@ exports.getHike = catchAsync(async (req, res, next) => {
   });
 });
 
+//Get hike
+exports.getHike = handlerFactory.getOne(Hike, { path: 'reviews' });
 //Add new hike
 exports.createHike = handlerFactory.createOne(Hike);
 //Update hike
 exports.updateHike = handlerFactory.updateOne(Hike);
 //Delete hike
 exports.deleteHike = handlerFactory.deleteOne(Hike);
+
+// exports.getHike = catchAsync(async (req, res, next) => {
+//   const hike = await Hike.findById(req.params.id).populate('reviews');
+//   // const hike = Hike.findOne({_id: req.params.id});
+
+//   if (!hike) {
+//     return next(new AppError('No hike found with the ID', 404));
+//   }
+
+//   res.status(200).json({
+//     status: 'success',
+//     data: {
+//       hike: hike,
+//     },
+//   });
+// });
 
 // exports.createHike = catchAsync(async (req, res, next) => {
 //   const newHike = await Hike.create(req.body);
