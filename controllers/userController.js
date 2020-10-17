@@ -65,11 +65,8 @@ exports.getUser = (req, res) => {
   });
 };
 
-exports.createUser = (req, res) => {
-  res.status(500).json({
-    status: 'Server Issue',
-  });
-};
+//Create user
+exports.createUser = handlerFactory.createOne(User);
 
 //Update user
 exports.updateUser = handlerFactory.updateOne(User);

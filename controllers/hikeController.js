@@ -32,18 +32,6 @@ exports.getAllHikes = catchAsync(async (req, res, next) => {
   });
 });
 
-//add new hike
-exports.createHike = catchAsync(async (req, res, next) => {
-  const newHike = await Hike.create(req.body);
-
-  res.status(201).json({
-    status: 'success',
-    data: {
-      hike: newHike,
-    },
-  });
-});
-
 //Get a hike
 exports.getHike = catchAsync(async (req, res, next) => {
   const hike = await Hike.findById(req.params.id).populate('reviews');
@@ -61,8 +49,23 @@ exports.getHike = catchAsync(async (req, res, next) => {
   });
 });
 
+//Add new hike
+exports.createHike = handlerFactory.createOne(Hike);
 //Update hike
 exports.updateHike = handlerFactory.updateOne(Hike);
+//Delete hike
+exports.deleteHike = handlerFactory.deleteOne(Hike);
+
+// exports.createHike = catchAsync(async (req, res, next) => {
+//   const newHike = await Hike.create(req.body);
+
+//   res.status(201).json({
+//     status: 'success',
+//     data: {
+//       hike: newHike,
+//     },
+//   });
+// });
 
 // exports.updateHike = catchAsync(async (req, res, next) => {
 //   const hike = await Hike.findByIdAndUpdate(req.params.id, req.body, {
@@ -81,9 +84,6 @@ exports.updateHike = handlerFactory.updateOne(Hike);
 //     },
 //   });
 // });
-
-//Delete hike
-exports.deleteHike = handlerFactory.deleteOne(Hike);
 
 // exports.deleteHike = catchAsync(async (req, res, next) => {
 //   const hike = await Hike.findByIdAndDelete(req.params.id);
