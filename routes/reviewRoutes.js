@@ -10,14 +10,16 @@ router
   .post(
     authController.protect,
     authController.restrictTo('user'),
+    reviewController.setHikeUserIds,
     reviewController.createReview
   );
 
 router
   .route('/:id')
+  .patch(reviewController.updateReview)
   .delete(
     authController.protect,
     authController.restrictTo('admin', 'lead-guide'),
-    reviewController.deleteHike
+    reviewController.deleteReview
   );
 module.exports = router;

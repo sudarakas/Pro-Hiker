@@ -32,18 +32,6 @@ exports.getAllHikes = catchAsync(async (req, res, next) => {
   });
 });
 
-//add new hike
-exports.createHike = catchAsync(async (req, res, next) => {
-  const newHike = await Hike.create(req.body);
-
-  res.status(201).json({
-    status: 'success',
-    data: {
-      hike: newHike,
-    },
-  });
-});
-
 //Get a hike
 exports.getHike = catchAsync(async (req, res, next) => {
   const hike = await Hike.findById(req.params.id).populate('reviews');
@@ -61,27 +49,41 @@ exports.getHike = catchAsync(async (req, res, next) => {
   });
 });
 
+//Add new hike
+exports.createHike = handlerFactory.createOne(Hike);
 //Update hike
-exports.updateHike = catchAsync(async (req, res, next) => {
-  const hike = await Hike.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
-
-  if (!hike) {
-    return next(new AppError('No hike found with the ID', 404));
-  }
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      hike: hike,
-    },
-  });
-});
-
+exports.updateHike = handlerFactory.updateOne(Hike);
 //Delete hike
 exports.deleteHike = handlerFactory.deleteOne(Hike);
+
+// exports.createHike = catchAsync(async (req, res, next) => {
+//   const newHike = await Hike.create(req.body);
+
+//   res.status(201).json({
+//     status: 'success',
+//     data: {
+//       hike: newHike,
+//     },
+//   });
+// });
+
+// exports.updateHike = catchAsync(async (req, res, next) => {
+//   const hike = await Hike.findByIdAndUpdate(req.params.id, req.body, {
+//     new: true,
+//     runValidators: true,
+//   });
+
+//   if (!hike) {
+//     return next(new AppError('No hike found with the ID', 404));
+//   }
+
+//   res.status(200).json({
+//     status: 'success',
+//     data: {
+//       hike: hike,
+//     },
+//   });
+// });
 
 // exports.deleteHike = catchAsync(async (req, res, next) => {
 //   const hike = await Hike.findByIdAndDelete(req.params.id);
