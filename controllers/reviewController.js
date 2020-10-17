@@ -1,25 +1,5 @@
 const Review = require('../models/reviewModel');
-const catchAsync = require('../utils/catchAsync');
 const handlerFactory = require('./handlerFactory');
-
-//Get all reviews
-exports.getAllReviews = catchAsync(async (req, res, next) => {
-  //Create the filter
-  let filter = {};
-  //If req URL contains a hike id, filter hike
-  if (req.params.hikeId) filter = { hike: req.params.hikeId };
-  //Apply the filter
-  const reviews = await Review.find(filter);
-
-  //Send the response
-  res.status(200).json({
-    status: 'success',
-    result: reviews.length,
-    data: {
-      reviews: reviews,
-    },
-  });
-});
 
 exports.setHikeUserIds = (req, res, next) => {
   //Allow nested routes
@@ -30,6 +10,10 @@ exports.setHikeUserIds = (req, res, next) => {
   next();
 };
 
+//Get all reviews
+exports.getAllReviews = handlerFactory.getAll(Review);
+//Get Review
+exports.getReview = handlerFactory.getOne(Review);
 //Create new review
 exports.createReview = handlerFactory.createOne(Review);
 //Update Review
