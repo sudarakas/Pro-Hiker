@@ -1,11 +1,9 @@
 const Review = require('../models/reviewModel');
-//const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
-//const AppError = require('../utils/appError');
+const handlerFactory = require('./handlerFactory');
 
 //Get all reviews
 exports.getAllReviews = catchAsync(async (req, res, next) => {
-
   //Create the filter
   let filter = {};
   //If req URL contains a hike id, filter hike
@@ -40,3 +38,6 @@ exports.createReview = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+//Delete Review
+exports.deleteReview = handlerFactory.deleteOne(Review);
