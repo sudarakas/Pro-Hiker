@@ -62,23 +62,25 @@ exports.getHike = catchAsync(async (req, res, next) => {
 });
 
 //Update hike
-exports.updateHike = catchAsync(async (req, res, next) => {
-  const hike = await Hike.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
+exports.updateHike = handlerFactory.updateOne(Hike);
 
-  if (!hike) {
-    return next(new AppError('No hike found with the ID', 404));
-  }
+// exports.updateHike = catchAsync(async (req, res, next) => {
+//   const hike = await Hike.findByIdAndUpdate(req.params.id, req.body, {
+//     new: true,
+//     runValidators: true,
+//   });
 
-  res.status(200).json({
-    status: 'success',
-    data: {
-      hike: hike,
-    },
-  });
-});
+//   if (!hike) {
+//     return next(new AppError('No hike found with the ID', 404));
+//   }
+
+//   res.status(200).json({
+//     status: 'success',
+//     data: {
+//       hike: hike,
+//     },
+//   });
+// });
 
 //Delete hike
 exports.deleteHike = handlerFactory.deleteOne(Hike);

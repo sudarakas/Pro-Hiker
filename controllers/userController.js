@@ -71,11 +71,8 @@ exports.createUser = (req, res) => {
   });
 };
 
-exports.updateUser = (req, res) => {
-  res.status(500).json({
-    status: 'Server Issue',
-  });
-};
+//Update user
+exports.updateUser = handlerFactory.updateOne(User);
 
 //Delete user
 exports.deleteUser = handlerFactory.deleteOne(User);
