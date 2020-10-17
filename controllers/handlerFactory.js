@@ -1,5 +1,6 @@
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const APIFeatures = require('../utils/apiFeatures');
 
 //Factory function for creating
 exports.createOne = (Model) =>
@@ -9,7 +10,7 @@ exports.createOne = (Model) =>
     res.status(201).json({
       status: 'success',
       data: {
-        document: document,
+        data: document,
       },
     });
   });
@@ -26,7 +27,7 @@ exports.deleteOne = (Model) =>
     res.status(204).json({
       status: 'success',
       data: {
-        document: null,
+        data: null,
       },
     });
   });
@@ -46,7 +47,7 @@ exports.updateOne = (Model) =>
     res.status(200).json({
       status: 'success',
       data: {
-        document: document,
+        data: document,
       },
     });
   });
@@ -68,7 +69,33 @@ exports.getOne = (Model, populateOptions) =>
     res.status(200).json({
       status: 'success',
       data: {
-        document: document,
+        data: document,
+      },
+    });
+  });
+
+//Factory function for reading all
+exports.getAll = (Model) =>
+  catchAsync(async (req, res, next) => {
+    //For nested GET route for reviews
+    let filter = {};
+    //If req URL contains a hike id, filter hike
+    if (req.params.hikeId) filter = { hike: req.params.hikeId };
+
+    //Execute the query
+    const feature = new APIFeatures(Model.find(filter), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const document = await feature.query;
+
+    //Send the response
+    res.status(200).json({
+      status: 'success',
+      result: document.length,
+      data: {
+        data: document,
       },
     });
   });

@@ -3,6 +3,7 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const handlerFactory = require('./handlerFactory');
 
+//Object filtering
 const filterObject = (object, ...fields) => {
   const updatedObject = {};
   Object.keys(object).forEach((element) => {
@@ -11,18 +12,20 @@ const filterObject = (object, ...fields) => {
   return updatedObject;
 };
 
-exports.getAllUsers = catchAsync(async (req, res, next) => {
-  const hikes = await User.find();
+//Get all users
+exports.getAllUsers = handlerFactory.getAll(User);
+//Get user
+exports.getUser = handlerFactory.getOne(User);
+//Create user
+exports.createUser = handlerFactory.createOne(User);
+//Update user
+exports.updateUser = handlerFactory.updateOne(User);
+//Delete user
+exports.deleteUser = handlerFactory.deleteOne(User);
 
-  //send the response
-  res.status(200).json({
-    status: 'success',
-    result: hikes.length,
-    data: {
-      data: hikes,
-    },
-  });
-});
+/*
+  User Profile Section
+*/
 
 exports.updateProfile = catchAsync(async (req, res, next) => {
   //Reject update password data
@@ -58,12 +61,3 @@ exports.deleteProfile = catchAsync(async (req, res, next) => {
     data: null,
   });
 });
-
-//Get user
-exports.getUser = handlerFactory.getOne(User);
-//Create user
-exports.createUser = handlerFactory.createOne(User);
-//Update user
-exports.updateUser = handlerFactory.updateOne(User);
-//Delete user
-exports.deleteUser = handlerFactory.deleteOne(User);
