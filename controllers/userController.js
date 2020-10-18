@@ -27,6 +27,12 @@ exports.deleteUser = handlerFactory.deleteOne(User);
   User Profile Section
 */
 
+//Get me
+exports.getMe = (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
+};
+
 exports.updateProfile = catchAsync(async (req, res, next) => {
   //Reject update password data
   if (req.body.password || req.body.passwordConfirm)
