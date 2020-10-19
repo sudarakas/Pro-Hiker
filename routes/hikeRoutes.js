@@ -18,17 +18,31 @@ router
 
 router.route('/hike-stats').get(hikeController.getHikeStats);
 
-router.route('/monthy-plan/:year').get(hikeController.getMonthyPlan);
+router
+  .route('/monthy-plan/:year')
+  .get(
+    authController.protect,
+    authController.restrictTo('admin', 'lead-guide', 'guide'),
+    hikeController.getMonthyPlan
+  );
 
 router
   .route('/')
-  .get(authController.protect, hikeController.getAllHikes)
-  .post(hikeController.createHike);
+  .get(hikeController.getAllHikes)
+  .post(
+    authController.protect,
+    authController.restrictTo('admin', 'lead-guide'),
+    hikeController.createHike
+  );
 
 router
   .route('/:id')
   .get(hikeController.getHike)
-  .patch(hikeController.updateHike)
+  .patch(
+    authController.protect,
+    authController.restrictTo('admin', 'lead-guide'),
+    hikeController.updateHike
+  )
   .delete(
     authController.protect,
     authController.restrictTo('admin', 'lead-guide'),

@@ -10,16 +10,16 @@ router.post('/signin', authController.signin);
 router.post('/forgotPassword', authController.forgotPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
 
-router.patch(
-  '/updateProfile',
-  authController.protect,
-  userController.updateProfile
-);
-router.delete(
-  '/deleteProfile',
-  authController.protect,
-  userController.deleteProfile
-);
+//Apply auth middleware
+router.use(authController.protect);
+
+router.get('/me', userController.getMe, userController.getUser);
+router.patch('/updatePassword', authController.updatePassword);
+router.patch('/updateProfile', userController.updateProfile);
+router.delete('/deleteProfile', userController.deleteProfile);
+
+//Allow for admin users
+router.use(authController.restrictTo('admin'));
 
 router
   .route('/')

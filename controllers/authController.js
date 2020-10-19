@@ -205,3 +205,22 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     token,
   });
 });
+
+//Update user password
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  //Get current user with password
+  const user = await User.findById(req.user.id).select('+password');
+
+  //Check the current password is matched with entered password
+  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+    return next(new AppError('Current password is incorrect', 401));
+  }
+
+  //If matched update the password
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save();
+
+  //User login and send JWT
+  createSendToken(user, 200, res);
+});
