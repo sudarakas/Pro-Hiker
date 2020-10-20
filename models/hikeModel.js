@@ -122,6 +122,10 @@ const hikesScheme = new mongoose.Schema(
   }
 );
 
+//Indexing
+hikesScheme.index({ price: 1, ratingAverage: -1 });
+hikesScheme.index({ slug: 1 });
+
 //virtual properties
 hikesScheme.virtual('durationWeeks').get(function () {
   return this.duration / 7;
