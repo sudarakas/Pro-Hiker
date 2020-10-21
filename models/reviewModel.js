@@ -1,5 +1,5 @@
 const mongoose = require(`mongoose`);
-//const slugify = require(`slugify`);
+const Hike = require('./hikeModel');
 
 const reviewScheme = new mongoose.Schema(
   {
@@ -52,6 +52,32 @@ reviewScheme.pre(/^find/, function (next) {
   });
 
   next();
+});
+
+//Calculate rating average
+reviewScheme.statics.calcAverageRating = async function (hikeId) {
+  const stats = await this.aggregate([
+    {
+      $match: { hike: hikeId },
+    },
+    {
+      $group: {
+        _id: '$hike',
+        noRating: { $sum: 1 },
+        avgRating: { $avg: '$rating' },
+      },
+    },
+  ]);
+
+  await Hike.findByIdAndUpdate(hikeId, {
+    ratingQty: stats[0].noRating,
+    ratingAverage: stats[0].avgRating,
+  });
+};
+
+//Update the review with rating average
+reviewScheme.post('save', function () {
+  this.constructor.calcAverageRating(this.hike);
 });
 
 //Create the model with scheme
