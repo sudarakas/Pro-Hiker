@@ -1,5 +1,5 @@
 const mongoose = require(`mongoose`);
-//const slugify = require(`slugify`);
+const Hike = require('./hikeModel');
 
 const reviewScheme = new mongoose.Schema(
   {
@@ -52,6 +52,53 @@ reviewScheme.pre(/^find/, function (next) {
   });
 
   next();
+});
+
+//Calculate rating average
+reviewScheme.statics.calcAverageRating = async function (hikeId) {
+  const stats = await this.aggregate([
+    {
+      $match: { hike: hikeId },
+    },
+    {
+      $group: {
+        _id: '$hike',
+        noRating: { $sum: 1 },
+        avgRating: { $avg: '$rating' },
+      },
+    },
+  ]);
+
+  //Handling the no review for Hike
+  if (stats.length < 0) {
+    await Hike.findByIdAndUpdate(hikeId, {
+      ratingQty: stats[0].noRating,
+      ratingAverage: stats[0].avgRating,
+    });
+  } else {
+    await Hike.findByIdAndUpdate(hikeId, {
+      ratingQty: 0,
+      ratingAverage: 0,
+    });
+  }
+};
+
+//Update the review with rating average
+reviewScheme.post('save', function () {
+  this.constructor.calcAverageRating(this.hike);
+});
+
+//Get the update & delete review and pass it using this
+reviewScheme.pre(/^findOneAnd/, async function (next) {
+  this.currentReview = await this.findOne();
+  next();
+});
+
+//Update the average rating after updating or deleting reviews
+reviewScheme.post(/^findOneAnd/, async function () {
+  await this.currentReview.constructor.calcAverageRating(
+    this.currentReview.hike
+  );
 });
 
 //Create the model with scheme
