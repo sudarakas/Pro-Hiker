@@ -69,10 +69,18 @@ reviewScheme.statics.calcAverageRating = async function (hikeId) {
     },
   ]);
 
-  await Hike.findByIdAndUpdate(hikeId, {
-    ratingQty: stats[0].noRating,
-    ratingAverage: stats[0].avgRating,
-  });
+  //Handling the no review for Hike
+  if (stats.length < 0) {
+    await Hike.findByIdAndUpdate(hikeId, {
+      ratingQty: stats[0].noRating,
+      ratingAverage: stats[0].avgRating,
+    });
+  } else {
+    await Hike.findByIdAndUpdate(hikeId, {
+      ratingQty: 0,
+      ratingAverage: 0,
+    });
+  }
 };
 
 //Update the review with rating average
