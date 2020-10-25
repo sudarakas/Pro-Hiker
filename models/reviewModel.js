@@ -80,6 +80,19 @@ reviewScheme.post('save', function () {
   this.constructor.calcAverageRating(this.hike);
 });
 
+//Get the update & delete review and pass it using this
+reviewScheme.pre(/^findOneAnd/, async function (next) {
+  this.currentReview = await this.findOne();
+  next();
+});
+
+//Update the average rating after updating or deleting reviews
+reviewScheme.post(/^findOneAnd/, async function () {
+  await this.currentReview.constructor.calcAverageRating(
+    this.currentReview.hike
+  );
+});
+
 //Create the model with scheme
 const Review = mongoose.model('Review', reviewScheme);
 
