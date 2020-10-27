@@ -22,6 +22,7 @@ const hikesScheme = new mongoose.Schema(
       default: 0.0,
       min: [1, 'Rating must be greater than 1.0'],
       max: [10, 'Rating must be less than 10.0'],
+      set: (value) => Math.round(value * 10) / 10,
     },
     ratingQty: {
       type: Number,
