@@ -36,6 +36,9 @@ const reviewScheme = new mongoose.Schema(
   }
 );
 
+//Avoide duplicate entries from same user
+reviewScheme.index({ hike: 1, user: 1 }, { unique: true });
+
 //Populating the ref field
 reviewScheme.pre(/^find/, function (next) {
   // this.populate({
