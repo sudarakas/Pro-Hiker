@@ -27,6 +27,10 @@ router
   );
 
 router
+  .route('/hike-within/:distance/center/:latlng/unit/:unit')
+  .get(hikeController.getHikeWithinRange);
+
+router
   .route('/')
   .get(hikeController.getAllHikes)
   .post(
