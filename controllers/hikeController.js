@@ -1,6 +1,7 @@
 const Hike = require('../models/hikeModel');
 const catchAsync = require('../utils/catchAsync');
 const handlerFactory = require('./handlerFactory');
+const AppError = require('../utils/appError');
 
 //Middleware for modify the route
 exports.aliastopHikes = (req, res, next) => {
@@ -96,6 +97,27 @@ exports.getMonthyPlan = catchAsync(async (req, res, next) => {
     status: 'success',
     data: {
       plan,
+    },
+  });
+});
+
+exports.getHikeWithinRange = catchAsync(async (req, res, next) => {
+  const { distance, latlng, unit } = req.params;
+  const [lat, lng] = latlng.split(',');
+
+  const radius = unit === 'mi' ? distance / 3963.2 : distance / 6378.1;
+
+  if (!lat || !lng)
+    next(new AppError('lat and lng placed on wrong order', 400));
+
+  const hikes = await Hike.find({
+    startLocation: { $geoWithin: { $centerSphere: [[lng, lat], radius] } },
+  });
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      data: hikes,
     },
   });
 });
