@@ -30,6 +30,8 @@ router
   .route('/hike-within/:distance/center/:latlng/unit/:unit')
   .get(hikeController.getHikeWithinRange);
 
+router.route('/distances/:latlng/unit/:unit').get(hikeController.getDistances);
+
 router
   .route('/')
   .get(hikeController.getAllHikes)

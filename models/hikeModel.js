@@ -126,7 +126,7 @@ const hikesScheme = new mongoose.Schema(
 //Indexing
 hikesScheme.index({ price: 1, ratingAverage: -1 });
 hikesScheme.index({ slug: 1 });
-hikesScheme.index({ startLocation: '2dsphere' });
+hikesScheme.index({ startLocation: '2dsphere' }, { background: false });
 
 //virtual properties
 hikesScheme.virtual('durationWeeks').get(function () {
@@ -178,11 +178,11 @@ hikesScheme.pre(/^find/, function (next) {
 });
 
 //Aggregation Middleware
-hikesScheme.pre('aggregate', function (next) {
-  //add new condition to pipeline
-  this.pipeline().unshift({ $match: { secretHike: { $ne: true } } });
-  next();
-});
+// hikesScheme.pre('aggregate', function (next) {
+//   //add new condition to pipeline
+//   this.pipeline().unshift({ $match: { secretHike: { $ne: true } } });
+//   next();
+// });
 
 //create the model with scheme
 const Hike = mongoose.model('Hike', hikesScheme);
